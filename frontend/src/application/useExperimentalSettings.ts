@@ -1,8 +1,8 @@
 import {useEffect, useState} from 'react';
 import type {SettingsControls} from './useSettings';
-export type AssistedPlacementMode = 'manual' | 'easy' | 'range';
+export type AssistedPlacementMode = 'manual' | 'easy' | 'range' | 'destroy';
 export type ExperimentalConsentTarget = 'view' | AssistedPlacementMode | null;
-const modes: AssistedPlacementMode[] = ['manual', 'easy', 'range'];
+const modes: AssistedPlacementMode[] = ['manual', 'easy', 'range', 'destroy'];
 export function useExperimentalSettings(settings: SettingsControls) {
   const [pendingConsentFeature, setModal] = useState<ExperimentalConsentTarget>(null);
   const [text, setText] = useState<Partial<Record<'placementRadius' | 'autoPlacementCooldown', string>>>({});

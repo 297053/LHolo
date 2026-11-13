@@ -30,7 +30,7 @@ export function parseSettings(payload: string): SettingsState {
     'hudShowProjectedBlockName', 'hudShowWrongState', 'hudShowWrongType', 'hudShowExtraBlocks', 'materialHudEnabled', 'materialHudStackConversion', 'altWheelOffsetEnabled'];
   if (!v || !boolFields.every(k => typeof v[k] === 'boolean') || !integer(v.hudPosition, 0, 3)
     || !integer(v.materialHudMaxItems, 1, 50) || !integer(v.materialHudPosition, 0, 3) || !integer(v.placementRadius, 1, 4)
-    || !integer(v.autoPlacementCooldown, 0, 60) || !integer(v.activeMode, 0, 3) || typeof v.language !== 'string'
+    || !integer(v.autoPlacementCooldown, 0, 60) || !integer(v.activeMode, 0, 4) || typeof v.language !== 'string'
     || !id(s.context) || !id(s.ack) || !id(s.hotkeysRevision) || typeof s.accepted !== 'boolean' || typeof s.consent !== 'boolean'
     || !Array.isArray(s.languages) || !s.languages.length || !s.languages.every((l: any) => l && typeof l.code === 'string' && !!l.code && typeof l.name === 'string')
     || new Set(s.languages.map((l: any) => l.code)).size !== s.languages.length || !s.languages.some((l: any) => l.code === v.language)

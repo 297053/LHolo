@@ -18,6 +18,7 @@ export function ExperimentalPage({ labels, experimental, worldAvailable }: {
     manual: 'mode.manual',
     easy: 'mode.easy',
     range: 'mode.range',
+    destroy: 'mode.rangeDestroy',
   };
 
   const radiusLabel = labels['label.placementRadius'];
@@ -43,6 +44,11 @@ export function ExperimentalPage({ labels, experimental, worldAvailable }: {
       <LHoloCheckbox disabled={!worldAvailable || !experimental.canCommand} label={labels['checkbox.rangePlace']}
         value={experimental.activeMode === 'range'}
         onChange={checked => experimental.toggleMode('range', checked)} />
+    </div>
+    <div className="lholo-render-check">
+      <LHoloCheckbox disabled={!worldAvailable || !experimental.canCommand} label={labels['checkbox.rangeDestroy']}
+        value={experimental.activeMode === 'destroy'}
+        onChange={checked => experimental.toggleMode('destroy', checked)} />
     </div>
 
     {experimental.activeMode ? (

@@ -418,6 +418,7 @@ void loadSettings() {
         place::setEnabled(false);
         place::setManualMode(false);
         place::setRangeEnabled(false);
+        place::setRangeDestroyEnabled(false);
         place::setPlacementRadius(std::clamp(settings.placementRadius, 1, 4));
         place::setAutoPlacementBreakCooldownSeconds(
             std::clamp(settings.autoPlacementBreakCooldownSeconds, 0, 60)

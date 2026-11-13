@@ -242,6 +242,19 @@ bool isRangeEnabled() {
     return placementState().rangeEnabled();
 }
 
+void setRangeDestroyEnabled(bool enabled) {
+    if (enabled) {
+        logger().info("Range destruction enabled (radius {})", placementState().radius());
+    } else {
+        logger().info("Range destruction disabled");
+    }
+    placementState().setRangeDestroyEnabled(enabled);
+}
+
+bool isRangeDestroyEnabled() {
+    return placementState().rangeDestroyEnabled();
+}
+
 void setPlacementRadius(int radius) {
     placementState().setRadius(std::clamp(radius, 1, 4));
 }
