@@ -6,15 +6,8 @@
 #include "mc/world/item/registry/ItemRegistryManager.h"
 #include "nlohmann/json.hpp"
 
-// The 26.60 SDK declares this non-exported constructor for what was an
-// aggregate in 26.51. Preserve the former data{} value initialization;
-// setItemRendererBindings still fills the native visual metadata below.
-ItemRendererData::ItemRendererData()
-    : itemIdAux{}, isEmptyStack{}, chargedItem{}, itemCustomColor{},
-      itemPickupTime{}, showItemPickup{}, armorTrimMaterial{}, bannerPatterns{},
-      bannerColors{}, bannerType{}, decoratedPotSherds{}, serializedActorPose{},
-      shieldIsActive{}, shieldBaseColor{}, shieldBaseColorHovered{},
-      itemLoadstoneTrackingHandle{}, showBundleOpenFront{}, showBundleOpenBack{} {}
+// ItemRendererData is an aggregate in the 26.51 SDK, so data{} below value
+// initializes it directly.
 
 namespace lholo::oreui {
 std::optional<MaterialIconData> materialIconData(ItemStack const& item, IClientInstance const& client) {
