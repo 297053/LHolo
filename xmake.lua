@@ -40,7 +40,7 @@ rule_end()
 
 add_repositories("levimc-repo " .. (get_config("levimc_repo") or "https://github.com/LiteLDev/xmake-repo.git"))
 
-add_requires("levilamina 26.60.0", {configs = {target_type = get_config("target_type") or "client"}})
+add_requires("levilamina 26.51.5", {configs = {target_type = get_config("target_type") or "client"}})
 add_requires("levibuildscript")
 add_requires("zlib")
 
@@ -150,7 +150,7 @@ target("LHolo")
     end
     add_rules("lholo.i18n.resources")
     add_rules("@levibuildscript/linkrule")
-    add_rules("@levibuildscript/modpacker", {modVersion = "26.60.1"})
+    add_rules("@levibuildscript/modpacker", {modVersion = "26.51.5"})
     add_rules("lholo.oreui.package")
     add_shflags("/DELAYLOAD:bedrock_runtime.dll", {force = true})
     add_cxflags(
