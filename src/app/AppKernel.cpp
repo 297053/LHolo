@@ -47,8 +47,8 @@ std::atomic_bool controlFramesEnabled{};
 // World-facing actions belong to the client logic thread. Present may run
 // concurrently with this update and must never drain application queues.
 LL_TYPE_INSTANCE_HOOK(AppClientUpdate, ll::memory::HookPriority::Normal,
-    ClientInstance, &ClientInstance::$update, bool, bool isInitFinished, bool allowGameUpdate) {
-    auto const result = origin(isInitFinished, allowGameUpdate);
+    ClientInstance, &ClientInstance::$update, bool, bool isInitFinished) {
+    auto const result = origin(isInitFinished);
     if (controlFramesEnabled.load(std::memory_order_acquire)) {
         auto client = ll::service::getClientInstance();
         if (client && &client.get() == this) AppKernel::getInstance().processControlFrame();
