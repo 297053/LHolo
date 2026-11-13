@@ -16,6 +16,8 @@ void setEnabled(bool v) { detail::PlacementState::getInstance().setEnabled(v); }
 bool isEnabled() { return detail::PlacementState::getInstance().enabled(); }
 void setRangeEnabled(bool v) { detail::PlacementState::getInstance().setRangeEnabled(v); }
 bool isRangeEnabled() { return detail::PlacementState::getInstance().rangeEnabled(); }
+void setRangeDestroyEnabled(bool v) { detail::PlacementState::getInstance().setRangeDestroyEnabled(v); }
+bool isRangeDestroyEnabled() { return detail::PlacementState::getInstance().rangeDestroyEnabled(); }
 void setManualMode(bool v) { if (!v) detail::PlacementState::getInstance().resetManualInput(); detail::PlacementState::getInstance().setManualMode(v); }
 bool isManualMode() { return detail::PlacementState::getInstance().manualMode(); }
 void setPlacementRadius(int v) { detail::PlacementState::getInstance().setRadius(v); }
@@ -32,14 +34,14 @@ int runSettingsActionsTests() {
     int failures{};
     auto check = [&](bool ok, char const* msg) { if (!ok) {++failures; std::fprintf(stderr, "SettingsActionsTests: %s\n", msg);} };
     resetSettingsActions(); ui.resetHotkeys(); ui.setExperimentalConsentGiven(false);
-    place::setEnabled(false); place::setManualMode(false); place::setRangeEnabled(false);
+    place::setEnabled(false); place::setManualMode(false); place::setRangeEnabled(false); place::setRangeDestroyEnabled(false);
     auto snapshot = getSettingsSnapshot();
     nlohmann::json j{{"id", 1}, {"context", snapshot.context}, {"action", "set"}, {"field", "hudEnabled"}, {"expected", ui.hud().enabled}, {"value", false}};
     check(oreui::parseSettingsIntent(j.dump()).has_value(), "valid HUD boolean");
     auto bad = j; bad["value"] = 1;
     check(!oreui::parseSettingsIntent(bad.dump()), "boolean cannot become integer");
     bad = j; bad["field"] = "uiScale"; check(!oreui::parseSettingsIntent(bad.dump()), "OreUI cannot write ImGui scale");
-    bad = j; bad["field"] = "activeMode"; bad["expected"] = 0; bad["value"] = 4;
+    bad = j; bad["field"] = "activeMode"; bad["expected"] = 0; bad["value"] = 5;
     check(!oreui::parseSettingsIntent(bad.dump()), "mode range");
     bad["field"] = "placementRadius"; bad["expected"] = 1; bad["value"] = 18446744073709551615ULL;
     check(!oreui::parseSettingsIntent(bad.dump()), "integer overflow rejected");
@@ -76,6 +78,8 @@ int runSettingsActionsTests() {
     submitSettingsIntent(i); check(processSettingsActions() && ui.experimentalConsentGiven() && place::isManualMode(), "consent persists and activates requested mode");
     check(!apply(F::Mode, 3) && getSettingsSnapshot().accepted && place::isRangeEnabled() && !place::isManualMode() && !place::isEnabled(), "live mode mutually exclusive and not persisted");
     check(!apply(F::Mode, 2) && place::isEnabled() && !place::isRangeEnabled(), "easy mode exclusive");
+    check(!apply(F::Mode, 4) && place::isRangeDestroyEnabled() && !place::isRangeEnabled() && !place::isEnabled() && !place::isManualMode(), "range destruction mode exclusive");
+    check(!apply(F::Mode, 0) && !place::isRangeDestroyEnabled(), "range destruction disabled without save");
     check(!apply(F::Mode, 0) && !place::isEnabled(), "disable live modes without save");
     place::setPlacementRadius(4); check(apply(F::Radius, 2), "radius persisted");
     place::setAutoPlacementBreakCooldownSeconds(10); check(apply(F::Cooldown, 31), "cooldown persisted");
