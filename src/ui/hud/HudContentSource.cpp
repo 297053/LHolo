@@ -69,6 +69,7 @@ HudContent readHudContent() {
         if (place::isManualMode()) data.placementMode = i18n::tr(TextKey::ModeManual);
         else if (place::isEnabled()) data.placementMode = i18n::tr(TextKey::ModeEasy);
         else if (place::isRangeEnabled()) data.placementMode = i18n::tr(TextKey::ModeRange);
+        else if (place::isRangeDestroyEnabled()) data.placementMode = i18n::tr(TextKey::ModeRangeDestroy);
         result.projection = makeProjectionHud(settings, data);
     }
     if (materialEnabled) {

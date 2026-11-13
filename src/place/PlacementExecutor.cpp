@@ -21,6 +21,8 @@
 #include "block/BlockPlacementRules.h"
 #include "projection/Projection.h"
 #include "structure/StructureLoader.h"
+#include "structure/write/command/CommandTransport.h"
+#include "structure/write/command/CommandWorldWriter.h"
 
 #include "ll/api/mod/NativeMod.h"
 #include "ll/api/service/Bedrock.h"
@@ -49,6 +51,8 @@
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Tick.h"
+#include "mc/world/level/dimension/DimensionType.h"
+#include "mc/world/level/dimension/VanillaDimensions.h"
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/block/BlockType.h"
 #include "mc/world/level/block/SlabBlock.h"
@@ -98,6 +102,11 @@ constexpr std::uint64_t kSwapRetryMs = 200;
 // changing the player's aim invalidates the cache immediately.
 constexpr int           kRangePlanBudgetPerTick = 16;
 constexpr std::uint64_t kFailedPlanCacheMs      = 250;
+// Range destruction writes through server commands instead of inventory
+// transactions, so it is throttled independently: a small batch per interval
+// keeps a large projection from flooding the server with command requests.
+constexpr int           kRangeDestroyBudgetPerTick = 4;
+constexpr std::uint64_t kRangeDestroyIntervalMs    = 150;
 // Manual-mode typematic repeat: after the first block on press, holding pauses
 // for kManualInitialDelayMs and then auto-repeats every kManualRepeatIntervalMs
 // (like keyboard key-repeat), so a tap places one and a hold streams at a steady
@@ -108,6 +117,10 @@ constexpr std::uint64_t kManualRepeatIntervalMs = 120;
 // after the press, so a stale click never places a block later.
 constexpr std::uint64_t kManualRequestTimeoutMs = 400;
 
+
+// Unique request ids for range-destruction commands. Receipts are consumed by
+// the transport itself; ids only need to be unique within a session.
+std::atomic_uint64_t rangeDestroySequence{};
 
 std::int64_t packBlockPos(BlockPos const& p) {
     return (static_cast<std::int64_t>(p.x) & 0x3FFFFFF) << 38
@@ -761,6 +774,56 @@ bool resolveOrientedPlacement(
     return searchCurrentRotation(out);
 }
 
+// Range destruction breaks the solid world blocks that occupy projection cells
+// within the radius: the inverse of range placement. It reuses the command
+// write channel, which is server-authoritative and therefore works in survival
+// and on multiplayer servers that grant the player command permissions.
+void tickRangeDestroyImpl(LocalPlayer& player) {
+    auto client = ll::service::getClientInstance();
+    if (!client) return;
+    if (!structure::write::command::commandWorldAvailable()) return;
+
+    // Commands address the dimension by name; custom dimensions are not
+    // supported by this path.
+    auto const dimension = DimensionType{static_cast<int>(player.getDimensionId())};
+    std::string_view dimensionName;
+    if (dimension == VanillaDimensions::Overworld()) dimensionName = "overworld";
+    else if (dimension == VanillaDimensions::Nether()) dimensionName = "nether";
+    else if (dimension == VanillaDimensions::TheEnd()) dimensionName = "the_end";
+    else return;
+
+    auto const  now    = GetTickCount64();
+    Vec3 const  center = player.getPosition();
+    float const radius = static_cast<float>(placementState().radius());
+    auto&       region = player.getDimensionBlockSource();
+
+    auto candidates = projection::queryWrongCellsInRange(player, center, radius);
+    int  sent{};
+    for (auto const& cand : candidates) {
+        if (sent >= kRangeDestroyBudgetPerTick) break;
+        BlockPos const cell{cand.x, cand.y, cand.z};
+
+        // The correction scan can lag the world by a tick after a previous
+        // command, so confirm the cell still holds a block before breaking it.
+        if (region.getBlock(cell).isAir()) continue;
+        // Do not resend a cell the server is already applying.
+        if (recentlyPlaced(cell, now)) continue;
+
+        structure::write::command::Dispatch request{
+            "lholo-destroy:" + std::to_string(rangeDestroySequence.fetch_add(1) + 1),
+            "/execute in " + std::string{dimensionName} + " run setblock "
+                + std::to_string(cell.x) + " " + std::to_string(cell.y) + " "
+                + std::to_string(cell.z) + " air destroy",
+            structure::write::command::Target{{cell.x, cell.y, cell.z}, 0},
+        };
+        structure::write::command::sendCommand(*client, player, request);
+        markPlaced(cell, now);
+        ++sent;
+    }
+    // Spread the next batch out instead of sending on every client frame.
+    if (sent > 0) placementState().setNextPlaceAt(now + kRangeDestroyIntervalMs);
+}
+
 void tickRangePlaceImpl(LocalPlayer& player, PlacementContext const& placementContext) {
     auto const now = GetTickCount64();
     Vec3 const center = player.getPosition();
@@ -858,7 +921,8 @@ void tickEasyPlaceImpl() {
 
     bool const placementActive = placementState().enabled()
         || placementState().manualMode()
-        || placementState().rangeEnabled();
+        || placementState().rangeEnabled()
+        || placementState().rangeDestroyEnabled();
     bool const showProjectedBlockName = structure::shouldShowProjectedBlockName();
     if (!placementActive && !showProjectedBlockName) {
         updateAimedProjectedBlock(nullptr);
@@ -884,6 +948,13 @@ void tickEasyPlaceImpl() {
     if (!placementActive) return;
     PlacementContext const placementContext = makePlacementContext(origin, dir, pickRange);
     if (tickNow < placementState().nextPlaceAt()) return;
+
+    // Range destruction scans everything within the configured radius and
+    // breaks the blocks that disagree with the projection.
+    if (placementState().rangeDestroyEnabled()) {
+        tickRangeDestroyImpl(*player);
+        return;
+    }
 
     // Range placement scans everything within the configured radius.
     if (placementState().rangeEnabled()) {

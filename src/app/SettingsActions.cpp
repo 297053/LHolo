@@ -15,13 +15,21 @@ std::uint64_t ack{}, hotkeysRevision{};
 std::array<SettingsHotkey, input::kHotkeyCount> observedHotkeys{};
 bool accepted{}, cancelCapture{}, hudLayoutEditRequested{};
 auto& ui() { return structure::detail::StructureUiState::getInstance(); }
-int activeMode() { return place::isManualMode() ? 1 : place::isRangeEnabled() ? 3 : place::isEnabled() ? 2 : 0; }
+int activeMode() {
+    return place::isManualMode() ? 1
+        : place::isRangeEnabled() ? 3
+        : place::isRangeDestroyEnabled() ? 4
+        : place::isEnabled() ? 2
+        : 0;
+}
 void setMode(int mode) {
     // These are live session controls, deliberately excluded from config persistence.
-    place::setManualMode(false); place::setEnabled(false); place::setRangeEnabled(false);
+    place::setManualMode(false); place::setEnabled(false);
+    place::setRangeEnabled(false); place::setRangeDestroyEnabled(false);
     if (mode == 1) place::setManualMode(true);
     if (mode == 2) place::setEnabled(true);
     if (mode == 3) place::setRangeEnabled(true);
+    if (mode == 4) place::setRangeDestroyEnabled(true);
 }
 SettingsSnapshot snapshot() {
     auto h = ui().hud();
@@ -71,8 +79,8 @@ bool applyField(SettingsField field, SettingsValue const& value) {
 bool validSettingsIntent(SettingsIntent const& i) {
     if (!i.id) return false;
     if (i.action == SettingsAction::Consent)
-        return std::holds_alternative<int>(i.expected) && std::get<int>(i.expected) >= 0 && std::get<int>(i.expected) <= 3
-            && std::holds_alternative<int>(i.value) && std::get<int>(i.value) >= 0 && std::get<int>(i.value) <= 3;
+        return std::holds_alternative<int>(i.expected) && std::get<int>(i.expected) >= 0 && std::get<int>(i.expected) <= 4
+            && std::holds_alternative<int>(i.value) && std::get<int>(i.value) >= 0 && std::get<int>(i.value) <= 4;
     if (i.action == SettingsAction::ResetHotkeys) return true;
     if (i.action == SettingsAction::BeginCapture || i.action == SettingsAction::ResetHotkey || i.action == SettingsAction::ClearHotkey)
         return i.slot < input::kHotkeyCount;
@@ -81,7 +89,8 @@ bool validSettingsIntent(SettingsIntent const& i) {
         using F = SettingsField;
         auto integer = [&](int low, int high) { auto n = std::get_if<int>(&v); return n && *n >= low && *n <= high; };
         switch (i.field) {
-        case F::HudPosition: case F::MaterialHudPosition: case F::Mode: return integer(0, 3);
+        case F::HudPosition: case F::MaterialHudPosition: return integer(0, 3);
+        case F::Mode: return integer(0, 4);
         case F::MaterialHudMaxItems: return integer(settings::kMinMaterialHudItems, settings::kMaxMaterialHudItems);
         case F::Radius: return integer(1, 4);
         case F::Cooldown: return integer(0, 60);

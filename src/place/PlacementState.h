@@ -64,6 +64,8 @@ public:
     void setEnabled(bool enabled);
     [[nodiscard]] bool rangeEnabled() const;
     void setRangeEnabled(bool enabled);
+    [[nodiscard]] bool rangeDestroyEnabled() const;
+    void setRangeDestroyEnabled(bool enabled);
     [[nodiscard]] bool manualMode() const;
     void setManualMode(bool manual);
     [[nodiscard]] int radius() const;
@@ -110,6 +112,7 @@ private:
 
     std::atomic_bool     mEnabled{false};
     std::atomic_bool     mRangeEnabled{false};
+    std::atomic_bool     mRangeDestroy{false};
     std::atomic_bool     mManualMode{false};
     std::atomic_bool     mManualHeld{false};
     std::atomic_bool     mManualPlaceRequested{false};

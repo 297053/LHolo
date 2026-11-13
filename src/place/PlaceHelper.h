@@ -27,6 +27,10 @@ bool isEnabled();
 // player (still bounded by the player's actual placement reach).
 void setRangeEnabled(bool enabled);
 bool isRangeEnabled();
+// Range destruction: break solid world blocks that occupy projection cells
+// within the placement radius (the inverse of range placement).
+void setRangeDestroyEnabled(bool enabled);
+bool isRangeDestroyEnabled();
 void setPlacementRadius(int radius);
 int  getPlacementRadius();
 void setAutoPlacementBreakCooldownSeconds(int seconds);

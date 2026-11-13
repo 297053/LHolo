@@ -19,6 +19,9 @@ void PlacementState::setEnabled(bool enabled) { mEnabled.store(enabled, std::mem
 bool PlacementState::rangeEnabled() const { return mRangeEnabled.load(std::memory_order_acquire); }
 void PlacementState::setRangeEnabled(bool enabled) { mRangeEnabled.store(enabled, std::memory_order_release); }
 
+bool PlacementState::rangeDestroyEnabled() const { return mRangeDestroy.load(std::memory_order_acquire); }
+void PlacementState::setRangeDestroyEnabled(bool enabled) { mRangeDestroy.store(enabled, std::memory_order_release); }
+
 bool PlacementState::manualMode() const { return mManualMode.load(std::memory_order_acquire); }
 void PlacementState::setManualMode(bool manual) { mManualMode.store(manual, std::memory_order_release); }
 

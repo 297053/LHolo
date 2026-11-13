@@ -213,4 +213,17 @@ std::vector<RangeCandidate> queryMissingCellsInRange(LocalPlayer& player, Vec3 c
     return result;
 }
 
+std::vector<RangeCandidate> queryWrongCellsInRange(LocalPlayer& player, Vec3 const& center, float radius) {
+    std::vector<RangeCandidate> result;
+    detail::ProjectionSession::getInstance().withLockedState(
+        [&](detail::ProjectionState& state, overlay::BoundsWireframe&) {
+            if (!state.enabled || !state.structure) return;
+            if (!projectionWorldViewMatches(state, player)) return;
+            if (auto* selected = detail::selectedFileProjection(state))
+                result = detail::queryWrongProjectionCells(*selected, center, radius);
+        }
+    );
+    return result;
+}
+
 } // namespace lholo::projection

@@ -286,9 +286,11 @@
     LHOLO_TEXT_KEY("checkbox.manualPlace", CheckboxManualPlace, "")                                      \
     LHOLO_TEXT_KEY("checkbox.easyPlace", CheckboxEasyPlace, "")                                          \
     LHOLO_TEXT_KEY("checkbox.rangePlace", CheckboxRangePlace, "")                                        \
+    LHOLO_TEXT_KEY("checkbox.rangeDestroy", CheckboxRangeDestroy, "")                                    \
     LHOLO_TEXT_KEY("mode.manual", ModeManual, "")                                                        \
     LHOLO_TEXT_KEY("mode.easy", ModeEasy, "")                                                            \
     LHOLO_TEXT_KEY("mode.range", ModeRange, "")                                                          \
+    LHOLO_TEXT_KEY("mode.rangeDestroy", ModeRangeDestroy, "")                                            \
     LHOLO_TEXT_KEY("hint.modeEnabled", HintModeEnabled, "")                                              \
     LHOLO_TEXT_KEY("hint.assistedDisabledByConsent", HintAssistedDisabledByConsent, "")                  \
     LHOLO_TEXT_KEY("hint.assistedDisabled", HintAssistedDisabled, "")                                    \

@@ -68,4 +68,8 @@ ProjectionQuery queryProjection(LocalPlayer& player, BlockPos const& worldPos);
 
 std::vector<RangeCandidate> queryMissingCellsInRange(LocalPlayer& player, Vec3 const& center, float radius);
 
+// Cells the projection expects to hold a block while the world holds a
+// different solid block. Used by range destruction.
+std::vector<RangeCandidate> queryWrongCellsInRange(LocalPlayer& player, Vec3 const& center, float radius);
+
 } // namespace lholo::projection
