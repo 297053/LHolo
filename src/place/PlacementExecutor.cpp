@@ -21,8 +21,6 @@
 #include "block/BlockPlacementRules.h"
 #include "projection/Projection.h"
 #include "structure/StructureLoader.h"
-#include "structure/write/command/CommandTransport.h"
-#include "structure/write/command/CommandWorldWriter.h"
 
 #include "ll/api/mod/NativeMod.h"
 #include "ll/api/service/Bedrock.h"
@@ -51,8 +49,6 @@
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Tick.h"
-#include "mc/world/level/dimension/DimensionType.h"
-#include "mc/world/level/dimension/VanillaDimensions.h"
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/block/BlockType.h"
 #include "mc/world/level/block/SlabBlock.h"
@@ -121,6 +117,13 @@ constexpr std::uint64_t kManualRequestTimeoutMs = 400;
 // Unique request ids for range-destruction commands. Receipts are consumed by
 // the transport itself; ids only need to be unique within a session.
 std::atomic_uint64_t rangeDestroySequence{};
+
+// Range destruction through the vanilla GameMode break flow. Breaking is a
+// multi-tick process, so the current target is remembered across frames.
+std::optional<BlockPos> sActiveBreakPos;
+// The block face sent with the break request. The server resolves destruction
+// from the block position, so any valid face works; Down (0) is the simplest.
+constexpr uchar kBreakFace = 0;
 
 std::int64_t packBlockPos(BlockPos const& p) {
     return (static_cast<std::int64_t>(p.x) & 0x3FFFFFF) << 38
@@ -775,53 +778,58 @@ bool resolveOrientedPlacement(
 }
 
 // Range destruction breaks the solid world blocks that occupy projection cells
-// within the radius: the inverse of range placement. It reuses the command
-// write channel, which is server-authoritative and therefore works in survival
-// and on multiplayer servers that grant the player command permissions.
+// within the radius, using the vanilla GameMode break-block flow (the same path
+// a real player's long-press takes). No command permissions are required: the
+// client sends normal PlayerAction/InventoryTransaction packets and the server
+// applies survival/creative break rules as usual.
 void tickRangeDestroyImpl(LocalPlayer& player) {
-    auto client = ll::service::getClientInstance();
-    if (!client) return;
-    if (!structure::write::command::commandWorldAvailable()) return;
+    auto* gameMode = player.mGameMode.get().get();
+    if (!gameMode) return;
 
-    // Commands address the dimension by name; custom dimensions are not
-    // supported by this path.
-    auto const dimension = DimensionType{static_cast<int>(player.getDimensionId())};
-    std::string_view dimensionName;
-    if (dimension == VanillaDimensions::Overworld()) dimensionName = "overworld";
-    else if (dimension == VanillaDimensions::Nether()) dimensionName = "nether";
-    else if (dimension == VanillaDimensions::TheEnd()) dimensionName = "the_end";
-    else return;
+    auto&      region = player.getDimensionBlockSource();
+    Vec3 const playerPos = player.getPosition();
+    Vec3 const eyePos    = player.getEyePos();
+    float const reach    = player.getPickRange();
+    float const reachSq  = reach * reach;
 
-    auto const  now    = GetTickCount64();
-    Vec3 const  center = player.getPosition();
-    float const radius = static_cast<float>(placementState().radius());
-    auto&       region = player.getDimensionBlockSource();
+    auto const candidates = projection::queryWrongCellsInRange(
+        player, playerPos, static_cast<float>(placementState().radius())
+    );
 
-    auto candidates = projection::queryWrongCellsInRange(player, center, radius);
-    int  sent{};
-    for (auto const& cand : candidates) {
-        if (sent >= kRangeDestroyBudgetPerTick) break;
-        BlockPos const cell{cand.x, cand.y, cand.z};
+    auto const stillTargeted = [&](BlockPos const& pos) {
+        for (auto const& c : candidates)
+            if (c.x == pos.x && c.y == pos.y && c.z == pos.z) return true;
+        return false;
+    };
 
-        // The correction scan can lag the world by a tick after a previous
-        // command, so confirm the cell still holds a block before breaking it.
-        if (region.getBlock(cell).isAir()) continue;
-        // Do not resend a cell the server is already applying.
-        if (recentlyPlaced(cell, now)) continue;
-
-        structure::write::command::Dispatch request{
-            "lholo-destroy:" + std::to_string(rangeDestroySequence.fetch_add(1) + 1),
-            "/execute in " + std::string{dimensionName} + " run setblock "
-                + std::to_string(cell.x) + " " + std::to_string(cell.y) + " "
-                + std::to_string(cell.z) + " air destroy",
-            structure::write::command::Target{{cell.x, cell.y, cell.z}, 0},
-        };
-        structure::write::command::sendCommand(*client, player, request);
-        markPlaced(cell, now);
-        ++sent;
+    // Continue the in-progress break before picking a new target.
+    if (sActiveBreakPos) {
+        BlockPos const pos = *sActiveBreakPos;
+        if (stillTargeted(pos) && !region.getBlock(pos).isAir()) {
+            bool hasDestroyed = false;
+            gameMode->continueDestroyBlock(pos, kBreakFace, playerPos, hasDestroyed);
+            if (hasDestroyed || region.getBlock(pos).isAir()) sActiveBreakPos.reset();
+            return; // one block per tick
+        }
+        sActiveBreakPos.reset();
     }
-    // Spread the next batch out instead of sending on every client frame.
-    if (sent > 0) placementState().setNextPlaceAt(now + kRangeDestroyIntervalMs);
+
+    // No active break: start breaking the closest wrong cell within reach.
+    for (auto const& cand : candidates) {
+        BlockPos const cell{cand.x, cand.y, cand.z};
+        if (region.getBlock(cell).isAir()) continue;
+
+        Vec3 const center{cell.x + 0.5f, cell.y + 0.5f, cell.z + 0.5f};
+        float const dx = center.x - eyePos.x;
+        float const dy = center.y - eyePos.y;
+        float const dz = center.z - eyePos.z;
+        if (dx * dx + dy * dy + dz * dz > reachSq) continue;
+
+        bool hasDestroyed = false;
+        gameMode->startDestroyBlock(cell, kBreakFace, hasDestroyed);
+        if (!hasDestroyed) sActiveBreakPos = cell;
+        break;
+    }
 }
 
 void tickRangePlaceImpl(LocalPlayer& player, PlacementContext const& placementContext) {
@@ -946,15 +954,14 @@ void tickEasyPlaceImpl() {
         showProjectedBlockName && target ? target->blockEntityNbt : nullptr, &player->getLevel()
     );
     if (!placementActive) return;
-    PlacementContext const placementContext = makePlacementContext(origin, dir, pickRange);
-    if (tickNow < placementState().nextPlaceAt()) return;
-
-    // Range destruction scans everything within the configured radius and
-    // breaks the blocks that disagree with the projection.
+    // Range destruction drives the vanilla break progress every frame, so it
+    // must run before the placement throttle (which only gates block placement).
     if (placementState().rangeDestroyEnabled()) {
         tickRangeDestroyImpl(*player);
         return;
     }
+    PlacementContext const placementContext = makePlacementContext(origin, dir, pickRange);
+    if (tickNow < placementState().nextPlaceAt()) return;
 
     // Range placement scans everything within the configured radius.
     if (placementState().rangeEnabled()) {
