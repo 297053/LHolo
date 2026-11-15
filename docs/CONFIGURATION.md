@@ -16,7 +16,7 @@
 
 - 后缀 `Percent` 明确表示百分比。透明度 0～100，HUD 缩放 50～200；默认背景不透明度 60%、缩放 100%。
 - 材料 `convertToStacks` 默认 `false`，`itemsPerPage` 范围 1～50、默认 5。
-- `placement.radius` 范围 1～4，`breakCooldownSeconds` 范围 0～60、默认 10 秒。
+- `placement.radius` 范围 1～6，`breakCooldownSeconds` 范围 0～60、默认 10 秒。
 - `position.anchor` 使用 `topLeft`、`bottomLeft`、`topRight`、`bottomRight` 四个稳定名称。
 - 使用原生 HUD 编辑器拖动后，位置中会增加 `custom: {"x": 0.2, "y": 0.3}`，坐标相对视口归一化到 0～1。不使用自定义位置时省略整个 `custom` 对象，避免保存无效坐标。
 

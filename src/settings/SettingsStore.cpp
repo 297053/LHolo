@@ -122,7 +122,7 @@ void normalize(Settings& s) {
     s.writeHudPosition = std::clamp(s.writeHudPosition, 0, kTopCenterHudPosition);
     s.hudPosition = std::clamp(s.hudPosition, 0, 3);
     s.materialHudPosition = std::clamp(s.materialHudPosition, 0, 3);
-    s.placementRadius = std::clamp(s.placementRadius, 1, 4);
+    s.placementRadius = std::clamp(s.placementRadius, 1, 6);
     s.autoPlacementBreakCooldownSeconds = std::clamp(s.autoPlacementBreakCooldownSeconds, 0, 60);
     for (std::size_t n = 0; n < kHudPanelCount; ++n) {
         s.hudScales[n] = std::clamp(s.hudScales[n], 50, 200);
@@ -286,7 +286,7 @@ void readCurrent(Json const& data, Settings& out) {
     for (auto binding : bindings(out)) if (hotkeys.contains(binding.name)) decodeBinding(hotkeys.at(binding.name), binding);
     auto const placement = section(data, "placement");
     out.experimentalConsent = placement.value("consentGiven", out.experimentalConsent);
-    out.placementRadius = integer(placement, "radius", out.placementRadius, 1, 4);
+    out.placementRadius = integer(placement, "radius", out.placementRadius, 1, 6);
     out.autoPlacementBreakCooldownSeconds = integer(placement, "breakCooldownSeconds", out.autoPlacementBreakCooldownSeconds, 0, 60);
 }
 Json position(Settings const& s, std::size_t n, int anchor) {

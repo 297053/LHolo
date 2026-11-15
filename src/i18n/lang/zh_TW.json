@@ -240,7 +240,7 @@
   "hint.modeEnabled": "%s 已暫時開啟",
   "hint.assistedDisabledByConsent": "輔助放置未開啟（需先同意實驗性功能聲明）",
   "hint.assistedDisabled": "輔助放置未開啟",
-  "label.placementRadius": "放置半徑（範圍 1～4）",
+  "label.placementRadius": "放置半徑（範圍 1～6）",
   "label.autoPlacementCooldown": "投影方塊被破壞後自動放置冷卻時間（範圍 0～60 秒）",
   "section.interfaceSettings": "介面設定",
   "label.uiScale": "介面縮放（範圍 1～5）",

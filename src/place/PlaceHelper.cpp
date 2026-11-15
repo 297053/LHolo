@@ -256,7 +256,7 @@ bool isRangeDestroyEnabled() {
 }
 
 void setPlacementRadius(int radius) {
-    placementState().setRadius(std::clamp(radius, 1, 4));
+    placementState().setRadius(std::clamp(radius, 1, 6));
 }
 
 int getPlacementRadius() {

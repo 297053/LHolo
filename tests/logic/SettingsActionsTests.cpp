@@ -81,7 +81,8 @@ int runSettingsActionsTests() {
     check(!apply(F::Mode, 4) && place::isRangeDestroyEnabled() && !place::isRangeEnabled() && !place::isEnabled() && !place::isManualMode(), "range destruction mode exclusive");
     check(!apply(F::Mode, 0) && !place::isRangeDestroyEnabled(), "range destruction disabled without save");
     check(!apply(F::Mode, 0) && !place::isEnabled(), "disable live modes without save");
-    place::setPlacementRadius(4); check(apply(F::Radius, 2), "radius persisted");
+    place::setPlacementRadius(4); check(apply(F::Radius, 6) && place::getPlacementRadius() == 6, "maximum radius persisted");
+    check(apply(F::Radius, 2), "radius persisted");
     place::setAutoPlacementBreakCooldownSeconds(10); check(apply(F::Cooldown, 31), "cooldown persisted");
     auto originalLanguage = std::string{i18n::languagePreferenceCode()};
     auto target = i18n::languageCode(i18n::language()) == "en_US" ? "zh_CN" : "en_US";

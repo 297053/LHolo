@@ -92,7 +92,7 @@ bool validSettingsIntent(SettingsIntent const& i) {
         case F::HudPosition: case F::MaterialHudPosition: return integer(0, 3);
         case F::Mode: return integer(0, 4);
         case F::MaterialHudMaxItems: return integer(settings::kMinMaterialHudItems, settings::kMaxMaterialHudItems);
-        case F::Radius: return integer(1, 4);
+        case F::Radius: return integer(1, 6);
         case F::Cooldown: return integer(0, 60);
         case F::Language: { auto s = std::get_if<std::string>(&v); return s && !s->empty() && s->size() <= 32; }
         default: return std::holds_alternative<bool>(v);

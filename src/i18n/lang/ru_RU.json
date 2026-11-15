@@ -240,7 +240,7 @@
   "hint.modeEnabled": "%s включена на время текущей сессии",
   "hint.assistedDisabledByConsent": "Помощь при установке выключена (сначала примите предупреждение об экспериментальных функциях)",
   "hint.assistedDisabled": "Помощь при установке выключена",
-  "label.placementRadius": "Радиус установки (1–4)",
+  "label.placementRadius": "Радиус установки (1–6)",
   "label.autoPlacementCooldown": "Задержка автоматической установки после разрушения блока проекции (0–60 с)",
   "section.interfaceSettings": "Настройки интерфейса",
   "label.uiScale": "Масштаб интерфейса (1–5)",

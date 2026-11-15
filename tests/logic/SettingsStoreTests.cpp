@@ -129,7 +129,7 @@ int runSettingsStoreTests() {
     check(loadSettingsFile(path, loaded) && loaded.materialHudMaxItems == 50 && loaded.hudScales[1] == 200
         && loaded.hudBackgroundOpacities[1] == 0 && loaded.hudPlacements[1] == HudPlacement{true, 1, 0}
         && loaded.correctionFillOpacity == 0 && loaded.correctionOutlineOpacity == 1
-        && loaded.placementRadius == 4 && loaded.autoPlacementBreakCooldownSeconds == 0, "numeric fields clamp at the file boundary");
+        && loaded.placementRadius == 6 && loaded.autoPlacementBreakCooldownSeconds == 0, "numeric fields clamp at the file boundary");
 
     for (auto const* text : {"[1]", "{", "{\"version\":14}", "{\"version\":13.5}", "{\"version\":4294967309}",
         "{\"version\":13,\"hud\":{\"materials\":{\"itemsPerPage\":5.5}}}", "{\"version\":\"13\"}",
