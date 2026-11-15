@@ -783,7 +783,7 @@ bool resolveOrientedPlacement(
 // client sends normal PlayerAction/InventoryTransaction packets and the server
 // applies survival/creative break rules as usual.
 void tickRangeDestroyImpl(LocalPlayer& player) {
-    auto* gameMode = player.mGameMode.get().get();
+    auto* gameMode = player.mGameMode.get();
     if (!gameMode) return;
 
     auto&      region = player.getDimensionBlockSource();
