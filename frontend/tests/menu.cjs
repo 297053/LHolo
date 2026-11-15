@@ -891,7 +891,7 @@ assert.equal(nodeText(selectTrigger(0)),'English▼');
 const translated={...labels,'section.interfaceSettings':'Settings live'};receive(JSON.stringify(translated));
 assert(JSON.stringify(tree.toJSON()).includes('Settings live'));receive(JSON.stringify(labels));
 click(labels['page.experimental']);
-assert.equal(pageChecks().length,3);
+assert.equal(pageChecks().length,4);
 renderer.act(()=>pageChecks()[0].props.onClick());
 const consentBackdrop=tree.root.findByProps({className:'lholo-modal-backdrop'});
 let consentContainer=consentBackdrop.parent;
@@ -909,7 +909,7 @@ assert.equal(settingsState.values.activeMode,3);assert(!pageChecks()[1].props.cl
 const expInputs=()=>tree.root.findAllByType('input');
 const editExp=(n,text)=>renderer.act(()=>{const input=inputMocks.get(expInputs()[n].props['data-narrate']);input.value=text;input.listeners.get('input')();});
 const blurExp=n=>renderer.act(()=>expInputs()[n].props.onBlur());
-editExp(0,'8');blurExp(0);settleSettings();assert.equal(settingsState.values.placementRadius,4);
+editExp(0,'8');blurExp(0);settleSettings();assert.equal(settingsState.values.placementRadius,6);
 editExp(0,'2');blurExp(0);settleSettings();assert.equal(settingsState.values.placementRadius,2);
 editExp(1,'99');blurExp(1);settleSettings();assert.equal(settingsState.values.autoPlacementCooldown,60);
 editExp(1,'-');blurExp(1);assert.equal(expInputs()[1].props.value,'60');

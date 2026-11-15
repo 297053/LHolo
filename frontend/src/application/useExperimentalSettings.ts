@@ -23,7 +23,7 @@ export function useExperimentalSettings(settings: SettingsControls) {
     if (pendingConsentFeature && settings.canCommand)
       settings.command('consent', undefined, pendingConsentFeature === 'view' ? 0 : modes.indexOf(pendingConsentFeature) + 1);
   };
-  const maximum = (field: string) => field === 'placementRadius' ? 4 : 60;
+  const maximum = (field: string) => field === 'placementRadius' ? 6 : 60;
   const minimum = (field: string) => field === 'placementRadius' ? 1 : 0;
   const edit = (field: 'placementRadius' | 'autoPlacementCooldown', value: string) => {
     setText(previous => ({...previous, [field]: value}));

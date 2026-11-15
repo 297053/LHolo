@@ -235,7 +235,7 @@
   "hint.modeEnabled": "%s is enabled for this session",
   "hint.assistedDisabledByConsent": "Assisted placement is off (accept the experimental features notice first)",
   "hint.assistedDisabled": "Assisted placement is off",
-  "label.placementRadius": "Placement radius (1-4)",
+  "label.placementRadius": "Placement radius (1-6)",
   "label.autoPlacementCooldown": "Auto-place cooldown after a projected block is broken (0-60 s)",
   "section.interfaceSettings": "Interface settings",
   "label.uiScale": "UI scale (1-5)",
