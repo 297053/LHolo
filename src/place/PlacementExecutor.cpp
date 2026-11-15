@@ -802,10 +802,18 @@ void tickRangeDestroyImpl(LocalPlayer& player) {
         return false;
     };
 
+    auto const inReach = [&](BlockPos const& cell) {
+        Vec3 const center{cell.x + 0.5f, cell.y + 0.5f, cell.z + 0.5f};
+        float const dx = center.x - eyePos.x;
+        float const dy = center.y - eyePos.y;
+        float const dz = center.z - eyePos.z;
+        return dx * dx + dy * dy + dz * dz <= reachSq;
+    };
+
     // Continue the in-progress break before picking a new target.
     if (sActiveBreakPos) {
         BlockPos const pos = *sActiveBreakPos;
-        if (stillTargeted(pos) && !region.getBlock(pos).isAir()) {
+        if (stillTargeted(pos) && !region.getBlock(pos).isAir() && inReach(pos)) {
             bool hasDestroyed = false;
             gameMode->continueDestroyBlock(pos, kBreakFace, playerPos, hasDestroyed);
             if (hasDestroyed || region.getBlock(pos).isAir()) sActiveBreakPos.reset();
@@ -817,13 +825,7 @@ void tickRangeDestroyImpl(LocalPlayer& player) {
     // No active break: start breaking the closest wrong cell within reach.
     for (auto const& cand : candidates) {
         BlockPos const cell{cand.x, cand.y, cand.z};
-        if (region.getBlock(cell).isAir()) continue;
-
-        Vec3 const center{cell.x + 0.5f, cell.y + 0.5f, cell.z + 0.5f};
-        float const dx = center.x - eyePos.x;
-        float const dy = center.y - eyePos.y;
-        float const dz = center.z - eyePos.z;
-        if (dx * dx + dy * dy + dz * dz > reachSq) continue;
+        if (region.getBlock(cell).isAir() || !inReach(cell)) continue;
 
         bool hasDestroyed = false;
         gameMode->startDestroyBlock(cell, kBreakFace, hasDestroyed);
