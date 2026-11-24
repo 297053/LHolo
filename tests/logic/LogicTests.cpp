@@ -40,6 +40,7 @@ int runTransformActionsTests();
 int runRenderSettingsTests();
 int runSettingsStoreTests();
 int runSettingsActionsTests();
+int runMiningSessionTests();
 int runCaptureFacetLifetimeTests();
 int runNativeHudTests();
 int runTaskTests();
@@ -1043,6 +1044,7 @@ int main(int argc, char** argv) {
     testJavaTextComponents();
     testI18n();
     LHOLO_CHECK(runSettingsActionsTests() == 0);
+    LHOLO_CHECK(runMiningSessionTests() == 0);
     LHOLO_CHECK(runNativeHudTests() == 0);
     LHOLO_CHECK(runTaskTests() == 0);
     LHOLO_CHECK(runIndependentTaskFilesTests() == 0);

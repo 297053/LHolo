@@ -155,6 +155,8 @@ void readLegacy(Json const& json, Settings& out) {
         "autoPlacementBreakCooldownSeconds",
         out.autoPlacementBreakCooldownSeconds
     );
+    out.noBreakDelay = json.value("noBreakDelay", out.noBreakDelay);
+    out.autoTool = json.value("autoTool", out.autoTool);
     out.hudEnabled = json.value("hudEnabled", out.hudEnabled);
     out.hudShowFileName = json.value("hudShowFileName", out.hudShowFileName);
     out.hudShowLayer = json.value("hudShowLayer", out.hudShowLayer);
@@ -288,6 +290,8 @@ void readCurrent(Json const& data, Settings& out) {
     out.experimentalConsent = placement.value("consentGiven", out.experimentalConsent);
     out.placementRadius = integer(placement, "radius", out.placementRadius, 1, 6);
     out.autoPlacementBreakCooldownSeconds = integer(placement, "breakCooldownSeconds", out.autoPlacementBreakCooldownSeconds, 0, 60);
+    out.noBreakDelay = placement.value("noBreakDelay", out.noBreakDelay);
+    out.autoTool = placement.value("autoTool", out.autoTool);
 }
 Json position(Settings const& s, std::size_t n, int anchor) {
     Json result{{"anchor", Anchors[anchor]}};
@@ -326,7 +330,8 @@ Json encode(Settings s) {
                 {"scalePercent", s.hudScales[2]}, {"backgroundOpacityPercent", s.hudBackgroundOpacities[2]}}}}},
         {"input", {{"altWheelOffset", s.altWheelOffsetEnabled}, {"hotkeys", std::move(hotkeys)}}},
         {"placement", {{"consentGiven", s.experimentalConsent}, {"radius", s.placementRadius},
-            {"breakCooldownSeconds", s.autoPlacementBreakCooldownSeconds}}}
+            {"breakCooldownSeconds", s.autoPlacementBreakCooldownSeconds},
+            {"noBreakDelay", s.noBreakDelay}, {"autoTool", s.autoTool}}}
     };
 }
 Json read(std::filesystem::path const& path) {

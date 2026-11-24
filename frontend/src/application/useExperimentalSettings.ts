@@ -44,6 +44,10 @@ export function useExperimentalSettings(settings: SettingsControls) {
     editPlacementRadius: (v: string) => edit('placementRadius', v), commitPlacementRadius: () => commit('placementRadius'),
     stepPlacementRadius: (d: number) => step('placementRadius', d),
     editAutoPlacementCooldown: (v: string) => edit('autoPlacementCooldown', v), commitAutoPlacementCooldown: () => commit('autoPlacementCooldown'),
-    stepAutoPlacementCooldown: (d: number) => step('autoPlacementCooldown', d)};
+    stepAutoPlacementCooldown: (d: number) => step('autoPlacementCooldown', d),
+    noBreakDelay: settings.values.noBreakDelay,
+    autoTool: settings.values.autoTool,
+    toggleNoBreakDelay: (checked: boolean) => settings.change('noBreakDelay', checked),
+    toggleAutoTool: (checked: boolean) => settings.change('autoTool', checked)};
 }
 export type ExperimentalSettingsControls = ReturnType<typeof useExperimentalSettings>;

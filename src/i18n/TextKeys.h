@@ -296,6 +296,9 @@
     LHOLO_TEXT_KEY("hint.assistedDisabled", HintAssistedDisabled, "")                                    \
     LHOLO_TEXT_KEY("label.placementRadius", LabelPlacementRadius, "")                                    \
     LHOLO_TEXT_KEY("label.autoPlacementCooldown", LabelAutoPlacementCooldown, "")                        \
+    LHOLO_TEXT_KEY("section.miningAssists", SectionMiningAssists, "")                                    \
+    LHOLO_TEXT_KEY("checkbox.noBreakDelay", CheckboxNoBreakDelay, "")                                    \
+    LHOLO_TEXT_KEY("checkbox.autoTool", CheckboxAutoTool, "")                                            \
                                                                                                          \
     /* Interface settings page */                                                                        \
     LHOLO_TEXT_KEY("section.interfaceSettings", SectionInterfaceSettings, "")                            \

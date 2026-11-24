@@ -131,7 +131,7 @@ int runSettingsStoreTests() {
         && loaded.correctionFillOpacity == 0 && loaded.correctionOutlineOpacity == 1
         && loaded.placementRadius == 6 && loaded.autoPlacementBreakCooldownSeconds == 0, "numeric fields clamp at the file boundary");
 
-    for (auto const* text : {"[1]", "{", "{\"version\":14}", "{\"version\":13.5}", "{\"version\":4294967309}",
+    for (auto const* text : {"[1]", "{", "{\"version\":15}", "{\"version\":13.5}", "{\"version\":4294967309}",
         "{\"version\":13,\"hud\":{\"materials\":{\"itemsPerPage\":5.5}}}", "{\"version\":\"13\"}",
         "{\"version\":13,\"hud\":null}", "{\"version\":13,\"hud\":{\"materials\":{\"enabled\":1}}}",
         "{\"version\":13,\"hud\":{\"projection\":{\"position\":{\"anchor\":\"oops\"}}}}",

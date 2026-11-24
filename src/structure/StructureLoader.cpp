@@ -34,6 +34,7 @@
 #include "structure/capture/CaptureActions.h"
 #include "structure/java_to_bedrock/JavaToBedrock.h"
 #include "place/PlaceHelper.h"
+#include "mining/MiningHelper.h"
 #include "plugin/LHolo.h"
 #include "projection/Projection.h"
 
@@ -364,6 +365,8 @@ void loadSettings() {
         place::setAutoPlacementBreakCooldownSeconds(
             std::clamp(settings.autoPlacementBreakCooldownSeconds, 0, 60)
         );
+        mining::setNoBreakDelay(settings.noBreakDelay);
+        mining::setAutoTool(settings.autoTool);
         uiState().setHotkey(
             kGuiHotkeyIndex,
             std::clamp(settings.guiHotkey, 0, 255),
@@ -420,6 +423,8 @@ void saveSettings() {
         settings.placementRadius = place::getPlacementRadius();
         settings.autoPlacementBreakCooldownSeconds
             = place::getAutoPlacementBreakCooldownSeconds();
+        settings.noBreakDelay = mining::isNoBreakDelay();
+        settings.autoTool = mining::isAutoTool();
         settings.hudEnabled = hud.enabled;
         settings.hudShowFileName = hud.showFileName;
         settings.hudShowLayer = hud.showLayer;

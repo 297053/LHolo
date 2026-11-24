@@ -915,7 +915,7 @@ assert.equal(nodeText(selectTrigger(0)),'English▼');
 const translated={...labels,'section.interfaceSettings':'Settings live'};receive(JSON.stringify(translated));
 assert(JSON.stringify(tree.toJSON()).includes('Settings live'));receive(JSON.stringify(labels));
 click(labels['page.experimental']);
-assert.equal(pageChecks().length,4);
+assert.equal(pageChecks().length,6);
 renderer.act(()=>pageChecks()[0].props.onClick());
 const consentBackdrop=tree.root.findByProps({className:'lholo-modal-backdrop'});
 let consentContainer=consentBackdrop.parent;
@@ -943,6 +943,16 @@ assert.equal(expInputs()[1].props.value,'17','Rejected edit restores authoritati
 renderer.act(()=>pageChecks()[0].props.onClick());
 settingsState={...settingsState,context:21,values:{...settingsState.values,activeMode:0}};emitSettings();
 assert(pageChecks().every(b=>!b.props.className.includes('is-checked')),'World context reset clears pending mode');
+// Mining assists (No Break Delay / Auto Tool) are independent toggles that are
+// not gated by experimental consent or placement mode.
+renderer.act(()=>pageChecks()[4].props.onClick());settleSettings();
+assert.equal(settingsState.values.noBreakDelay,true,'No Break Delay toggle round-trips');
+renderer.act(()=>pageChecks()[4].props.onClick());settleSettings();
+assert.equal(settingsState.values.noBreakDelay,false);
+renderer.act(()=>pageChecks()[5].props.onClick());settleSettings();
+assert.equal(settingsState.values.autoTool,true,'Auto Tool toggle round-trips');
+renderer.act(()=>pageChecks()[5].props.onClick());settleSettings();
+assert.equal(settingsState.values.autoTool,false);
 click(labels['tasks.nav']);
 
 click(labels['menu.close']);

@@ -17,7 +17,7 @@
 
 namespace lholo::settings {
 
-inline constexpr int kSettingsVersion = 13;
+inline constexpr int kSettingsVersion = 14;
 
 struct Settings {
     // "auto" follows Minecraft; a locale code pins the interface language.
@@ -32,6 +32,9 @@ struct Settings {
     bool experimentalConsent{false};
     int placementRadius{4};
     int autoPlacementBreakCooldownSeconds{10};
+    // Mining assists (No Break Delay / Auto Tool). Independent, default off.
+    bool noBreakDelay{false};
+    bool autoTool{false};
 
     // Material and projection HUD preferences.
     bool writeHudEnabled{true};

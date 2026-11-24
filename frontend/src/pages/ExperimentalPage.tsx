@@ -90,6 +90,18 @@ export function ExperimentalPage({ labels, experimental, worldAvailable }: {
           onClick={() => experimental.stepAutoPlacementCooldown(1)} />
       </div>
     </div>
+
+    <div className="lholo-section-title">{labels['section.miningAssists']}</div>
+    <div className="lholo-render-check">
+      <LHoloCheckbox disabled={!experimental.ready || !experimental.canCommand} label={labels['checkbox.noBreakDelay']}
+        value={experimental.noBreakDelay}
+        onChange={checked => experimental.toggleNoBreakDelay(checked)} />
+    </div>
+    <div className="lholo-render-check">
+      <LHoloCheckbox disabled={!experimental.ready || !experimental.canCommand} label={labels['checkbox.autoTool']}
+        value={experimental.autoTool}
+        onChange={checked => experimental.toggleAutoTool(checked)} />
+    </div>
   </>;
 }
 

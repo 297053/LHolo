@@ -28,6 +28,7 @@
 #include "overlay/BoundsWireframe.h"
 #include "render/RenderCamera.h"
 #include "place/PlaceHelper.h"
+#include "mining/MiningHelper.h"
 #include "plugin/LHolo.h"
 #include "structure/capture/StructureCapture.h"
 #include "structure/StructureLoader.h"
@@ -61,6 +62,7 @@ namespace {
 
 void resetWorldAfterExit() {
     place::resetWorldSession();
+    mining::resetWorldSession();
     structure::capture::clear();
     structure::resetWorldSession();
     structure::showActionHint(
@@ -124,6 +126,7 @@ void suspendProjectionDimension(ProjectionState& state) {
     auto const anchor = state.anchor;
     bool const hadVisibleFiles = !state.structure->composed || structure::hasVisibleTaskFiles(*state.structure);
     place::resetDimensionSession();
+    mining::resetDimensionSession();
     structure::resetDimensionSession();
     ProjectionSession::getInstance().suspendForDimension(
         state.structureGeneration,

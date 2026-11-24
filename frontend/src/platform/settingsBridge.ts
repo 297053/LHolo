@@ -5,6 +5,7 @@ export interface SettingsValues {
   hudShowWrongState: boolean; hudShowWrongType: boolean; hudShowExtraBlocks: boolean;
   materialHudEnabled: boolean; materialHudStackConversion: boolean; materialHudMaxItems: number; materialHudPosition: number; altWheelOffsetEnabled: boolean;
   placementRadius: number; autoPlacementCooldown: number; activeMode: number; language: string;
+  noBreakDelay: boolean; autoTool: boolean;
 }
 export type SettingsField = keyof SettingsValues;
 export interface SettingsHotkey {slot: number; labelKey: string; groupKey: string; key: number; modifiers: number; capturing: boolean; display: string}
@@ -27,7 +28,7 @@ export function parseSettings(payload: string): SettingsState {
   const integer = (n: unknown, low: number, high: number) => typeof n === 'number' && Number.isInteger(n) && n >= low && n <= high;
   const id = (n: unknown) => typeof n === 'number' && Number.isSafeInteger(n) && n >= 0;
   const boolFields = ['writeHudEnabled', 'hudEnabled', 'hudShowFileName', 'hudShowLayer', 'hudShowOverallProgress', 'hudShowProgress',
-    'hudShowProjectedBlockName', 'hudShowWrongState', 'hudShowWrongType', 'hudShowExtraBlocks', 'materialHudEnabled', 'materialHudStackConversion', 'altWheelOffsetEnabled'];
+    'hudShowProjectedBlockName', 'hudShowWrongState', 'hudShowWrongType', 'hudShowExtraBlocks', 'materialHudEnabled', 'materialHudStackConversion', 'altWheelOffsetEnabled', 'noBreakDelay', 'autoTool'];
   if (!v || !boolFields.every(k => typeof v[k] === 'boolean') || !integer(v.hudPosition, 0, 3)
     || !integer(v.materialHudMaxItems, 1, 50) || !integer(v.materialHudPosition, 0, 3) || !integer(v.placementRadius, 1, 6)
     || !integer(v.autoPlacementCooldown, 0, 60) || !integer(v.activeMode, 0, 4) || typeof v.language !== 'string'

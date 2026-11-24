@@ -2,6 +2,7 @@
 #include "structure/StructureUiState.h"
 #include "structure/StructureSession.h"
 #include "place/PlaceHelper.h"
+#include "mining/MiningHelper.h"
 #include "i18n/Translator.h"
 #include <mutex>
 #include <optional>
@@ -37,7 +38,8 @@ SettingsSnapshot snapshot() {
         h.showProgress, h.showProjectedBlockName, h.showWrongState, h.showWrongType, h.showExtraBlocks,
         ui().materialHudEnabled(), ui().materialHudStackConversion(), ui().materialHudMaxItems(), ui().materialHudPosition(), ui().altWheelOffsetEnabled(),
         place::getPlacementRadius(), place::getAutoPlacementBreakCooldownSeconds(), activeMode(),
-        std::string{i18n::languagePreferenceCode()}, ui().writeHudEnabled()}, {}, 0,
+        std::string{i18n::languagePreferenceCode()}, ui().writeHudEnabled(),
+        mining::isNoBreakDelay(), mining::isAutoTool()}, {}, 0,
         structure::detail::StructureSession::getInstance().transformEditorState().context, ack,
         ui().experimentalConsentGiven(), accepted};
     for (std::size_t n = 0; n < s.hotkeys.size(); ++n) {
@@ -72,6 +74,8 @@ bool applyField(SettingsField field, SettingsValue const& value) {
     case F::Cooldown: place::setAutoPlacementBreakCooldownSeconds(std::get<int>(value)); return true;
     case F::Mode: setMode(std::get<int>(value)); return false;
     case F::Language: return i18n::setLanguageByCode(std::get<std::string>(value));
+    case F::NoBreakDelay: mining::setNoBreakDelay(std::get<bool>(value)); return true;
+    case F::AutoTool: mining::setAutoTool(std::get<bool>(value)); return true;
     default: return false;
     }
 }

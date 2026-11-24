@@ -25,6 +25,7 @@
 #include "oreui/OreUiActionHint.h"
 #include "input/WindowHotkeys.h"
 #include "place/PlaceHelper.h"
+#include "mining/MiningHelper.h"
 #include "plugin/LHolo.h"
 #include "projection/ProjectionController.h"
 #include "projection/mesh/ProjectionMeshWorker.h"
@@ -126,6 +127,10 @@ bool AppKernel::enable() {
         logger.warn("Failed to install easy-place hooks");
     }
 
+    if (!mining::installHook()) {
+        logger.warn("Failed to install mining assist hooks");
+    }
+
     if (!input::installProjectionInputGuard()) {
         logger.warn("Failed to install projection mouse-wheel guard");
     }
@@ -161,11 +166,13 @@ bool AppKernel::disable() {
     // resets held placement/input state and joins the projection mesh worker
     // while its Level/Dimension pointers are still valid.
     place::resetWorldSession();
+    mining::resetWorldSession();
     structure::capture::resetActions();
     structure::resetWorldSession();
     structure::capture::clear();
     input::uninstallProjectionInputGuard();
     place::uninstallHook();
+    mining::uninstallHook();
     projection::detail::projectionController().uninstallHooks();
     // Projection hooks contain the automatic overlay-install retry path, so
     // remove them before tearing the overlay down.
