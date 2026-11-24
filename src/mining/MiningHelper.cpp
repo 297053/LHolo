@@ -63,10 +63,15 @@ void applyAutoToolStart(GameMode& gm, BlockPos const& pos) {
     Player& player = gm.mPlayer;
     Block const& block = player.getDimensionBlockSource().getBlock(pos);
 
+    // Score each hotbar slot with the same tool-aware speed the game uses to
+    // advance break progress. ItemStack::getDestroySpeed is MCNAPI (not exported
+    // by bedrock_runtime_api.lib, so it cannot link); Block::getDestroySpeed is
+    // MCAPI and consults the passed item, so a pickaxe outranks an empty hand on
+    // stone here exactly as it does in vanilla.
     std::array<float, detail::kHotbarSlots> speeds{};
     auto& inventory = player.getInventory();
     for (int slot = 0; slot < detail::kHotbarSlots; ++slot) {
-        speeds[slot] = inventory.getItem(slot).getDestroySpeed(block);
+        speeds[slot] = block.getDestroySpeed(inventory.getItem(slot));
     }
     int const current = player.getSelectedItemSlot();
     int const best    = detail::pickBestToolSlot(speeds, current);
