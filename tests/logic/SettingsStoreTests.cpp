@@ -122,7 +122,7 @@ int runSettingsStoreTests() {
         write(text);
         check(loadSettingsFile(path, loaded) && loaded == defaults, "missing current and legacy fields use defaults");
     }
-    write(R"({"version":13,"hud":{"materials":{"itemsPerPage":500,"scalePercent":500,"backgroundOpacityPercent":-1,
+    write(R"({"version":14,"hud":{"materials":{"itemsPerPage":500,"scalePercent":500,"backgroundOpacityPercent":-1,
         "position":{"anchor":"bottomRight","custom":{"x":2,"y":-1}}}},
         "rendering":{"correction":{"fillOpacityPercent":-5,"outlineOpacityPercent":500}},
         "placement":{"radius":100,"breakCooldownSeconds":-5}})");
@@ -132,11 +132,11 @@ int runSettingsStoreTests() {
         && loaded.placementRadius == 6 && loaded.autoPlacementBreakCooldownSeconds == 0, "numeric fields clamp at the file boundary");
 
     for (auto const* text : {"[1]", "{", "{\"version\":15}", "{\"version\":13.5}", "{\"version\":4294967309}",
-        "{\"version\":13,\"hud\":{\"materials\":{\"itemsPerPage\":5.5}}}", "{\"version\":\"13\"}",
-        "{\"version\":13,\"hud\":null}", "{\"version\":13,\"hud\":{\"materials\":{\"enabled\":1}}}",
-        "{\"version\":13,\"hud\":{\"projection\":{\"position\":{\"anchor\":\"oops\"}}}}",
-        "{\"version\":13,\"input\":{\"hotkeys\":{\"openMenu\":\"Ctrl+Ctrl+M\"}}}",
-        "{\"version\":13,\"input\":{\"hotkeys\":{\"openMenu\":\"Alt+Unknown\"}}}"}) {
+        "{\"version\":14,\"hud\":{\"materials\":{\"itemsPerPage\":5.5}}}", "{\"version\":\"13\"}",
+        "{\"version\":14,\"hud\":null}", "{\"version\":14,\"hud\":{\"materials\":{\"enabled\":1}}}",
+        "{\"version\":14,\"hud\":{\"projection\":{\"position\":{\"anchor\":\"oops\"}}}}",
+        "{\"version\":14,\"input\":{\"hotkeys\":{\"openMenu\":\"Ctrl+Ctrl+M\"}}}",
+        "{\"version\":14,\"input\":{\"hotkeys\":{\"openMenu\":\"Alt+Unknown\"}}}"}) {
         write(text);
         loaded = custom;
         bool rejected{};
