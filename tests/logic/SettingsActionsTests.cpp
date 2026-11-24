@@ -5,6 +5,8 @@
 #include "structure/StructureUiState.h"
 #include "place/PlaceHelper.h"
 #include "place/PlacementState.h"
+#include "mining/MiningHelper.h"
+#include "mining/MiningSession.h"
 #include "i18n/Translator.h"
 #include "nlohmann/json.hpp"
 #include <Windows.h>
@@ -24,6 +26,18 @@ void setPlacementRadius(int v) { detail::PlacementState::getInstance().setRadius
 int getPlacementRadius() { return detail::PlacementState::getInstance().radius(); }
 void setAutoPlacementBreakCooldownSeconds(int v) { detail::PlacementState::getInstance().setAutoPlacementBreakCooldownSeconds(v); }
 int getAutoPlacementBreakCooldownSeconds() { return detail::PlacementState::getInstance().autoPlacementBreakCooldownSeconds(); }
+}
+
+// Same idea for mining: keep the real MiningSession, but provide the free
+// function facade here so SettingsActions links in this test target without
+// pulling in MiningHelper.cpp (which installs GameMode hooks and needs the
+// running game). The mod's own MiningHelper.cpp provides the real definitions
+// in the LHolo target.
+namespace lholo::mining {
+void setNoBreakDelay(bool v) { detail::MiningSession::getInstance().setNoBreakDelay(v); }
+bool isNoBreakDelay() { return detail::MiningSession::getInstance().noBreakDelay(); }
+void setAutoTool(bool v) { detail::MiningSession::getInstance().setAutoTool(v); }
+bool isAutoTool() { return detail::MiningSession::getInstance().autoTool(); }
 }
 int runSettingsActionsTests() {
     using namespace lholo;
@@ -84,6 +98,11 @@ int runSettingsActionsTests() {
     place::setPlacementRadius(4); check(apply(F::Radius, 6) && place::getPlacementRadius() == 6, "maximum radius persisted");
     check(apply(F::Radius, 2), "radius persisted");
     place::setAutoPlacementBreakCooldownSeconds(10); check(apply(F::Cooldown, 31), "cooldown persisted");
+    mining::setNoBreakDelay(false); mining::setAutoTool(false);
+    check(apply(F::NoBreakDelay, true) && mining::isNoBreakDelay() && !mining::isAutoTool(), "no-break-delay persists independently of auto-tool");
+    check(apply(F::AutoTool, true) && mining::isAutoTool() && mining::isNoBreakDelay(), "auto-tool persists without disturbing no-break-delay");
+    check(apply(F::NoBreakDelay, false) && !mining::isNoBreakDelay() && mining::isAutoTool(), "no-break-delay clears independently");
+    check(apply(F::AutoTool, false) && !mining::isAutoTool() && !mining::isNoBreakDelay(), "auto-tool clears independently");
     auto originalLanguage = std::string{i18n::languagePreferenceCode()};
     auto target = i18n::languageCode(i18n::language()) == "en_US" ? "zh_CN" : "en_US";
     check(apply(F::Language, std::string{target}) && i18n::languageCode(i18n::language()) == target, "stable locale code applied");
