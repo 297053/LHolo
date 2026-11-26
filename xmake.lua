@@ -22,3 +22,13 @@ target("NoDelayMine")
     set_languages("c++20")
     add_files("src/**.cpp")
     add_includedirs("src")
+
+option("debug_symbols")
+    set_default(false)
+    set_showmenu(true)
+
+target("LHoloLogicTests")
+    set_kind("binary")
+    set_languages("c++20")
+    set_default(false)
+    add_files("tests/**.cpp")
