@@ -1,0 +1,9 @@
+{
+  "name": "${modName}",
+  "entry": "${modFile}",
+  "version": "${modVersion}",
+  "type": "native",
+  "platform": "${modPlatform}",
+  "description": "无挖掘延迟（仅客户端）/ No break delay, client only",
+  "author": "Cat66"
+}
