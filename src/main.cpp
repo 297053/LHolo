@@ -47,7 +47,13 @@ LL_TYPE_INSTANCE_HOOK(
     bool&             hasDestroyedBlock
 ) {
     clearBreakDelay(*this);
-    return origin(pos, face, playerPos, hasDestroyedBlock);
+    bool result = origin(pos, face, playerPos, hasDestroyedBlock);
+    // 4x clock: advance the vanilla destroy tick four times per game tick.
+    for (int i = 1; i < 4; ++i) {
+        clearBreakDelay(*this);
+        origin(pos, face, playerPos, hasDestroyedBlock);
+    }
+    return result;
 }
 
 bool gStartHooked{};
@@ -79,7 +85,7 @@ public:
         if (!gContinueHooked) {
             getSelf().getLogger().warn("Failed to hook GameMode::continueDestroyBlock; delay may remain on some ticks");
         }
-        getSelf().getLogger().info("No break delay enabled");
+        getSelf().getLogger().info("Speed4x mining enabled (4x tick)");
         return true;
     }
 

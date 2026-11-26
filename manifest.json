@@ -4,6 +4,6 @@
   "version": "${modVersion}",
   "type": "native",
   "platform": "${modPlatform}",
-  "description": "无挖掘延迟（仅客户端）/ No break delay, client only",
+  "description": "4 倍速挖掘（仅客户端）/ 4x mining tick, client only",
   "author": "Cat66"
 }

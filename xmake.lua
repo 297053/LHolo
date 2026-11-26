@@ -18,7 +18,7 @@ add_requires("levibuildscript")
 set_runtimes("MD")
 set_toolchains("clang-cl")
 
-target("NoDelayMine")
+target("Speed4x")
     add_rules("@levibuildscript/linkrule")
     add_rules("@levibuildscript/modpacker", {modVersion = "26.60.1"})
     add_shflags("/DELAYLOAD:bedrock_runtime.dll", {force = true})
