@@ -187,6 +187,41 @@ target("LHolo")
     add_includedirs("src")
 
 
+target("SpeedMine")
+    add_rules("@levibuildscript/linkrule")
+    add_rules("@levibuildscript/modpacker", {modVersion = "26.60.1"})
+    add_shflags("/DELAYLOAD:bedrock_runtime.dll", {force = true})
+    add_cxflags(
+        "/utf-8",
+        "/W4",
+        "/w44265",
+        "/w44289",
+        "/w44296",
+        "/w45263",
+        "/w44738",
+        "/w45204"
+    )
+    add_cxflags(
+        "/EHs",
+        "-Wno-microsoft-cast",
+        "-Wno-invalid-offsetof",
+        "-Wno-c++2b-extensions",
+        "-Wno-microsoft-include",
+        "-Wno-overloaded-virtual",
+        "-Wno-ignored-qualifiers",
+        "-Wno-missing-field-initializers",
+        "-Wno-potentially-evaluated-expression",
+        "-Wno-pragma-system-header-outside-header",
+        {tools = {"clang_cl"}}
+    )
+    add_defines("NOMINMAX", "UNICODE")
+    add_syslinks("user32", "ole32", "shell32", "delayimp")
+    add_packages("levilamina")
+    set_kind("shared")
+    set_languages("c++20")
+    add_files("speedmine/*.cpp")
+
+
 target("LHoloLogicTests")
     add_rules("lholo.i18n.resources")
     set_kind("binary")
